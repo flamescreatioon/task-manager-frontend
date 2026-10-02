@@ -4,18 +4,24 @@ import TaskList from "./components/TaskList";
 import './App.css';
 
 function App(){
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(() => {
+    const storedTasks = localStorage.getItem('tasks');
 
-  useEffect(() => {
-    const storedTasks = JSON.parse(localStorage)
-    if(storedTasks){
-      setTasks(storedTasks)
+    if (storedTasks) {
+      try {
+        const parsedTasks = JSON.parse(storedTasks);
+        return Array.isArray(parsedTasks) ? parsedTasks : [];
+      } catch {
+        localStorage.removeItem('tasks');
+      }
     }
-  }, [])
+
+    return [];
+  });
 
   useEffect(() => {
     localStorage.setItem('tasks', JSON.stringify(tasks))
-  })
+  }, [tasks])
 
   const addTask =(task) =>{
     setTasks([...tasks, { name: task, completed: false}]);
